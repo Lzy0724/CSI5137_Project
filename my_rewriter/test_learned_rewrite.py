@@ -29,11 +29,18 @@ from my_rewriter.rewrite import learned_rewrite
 BUDGET = 20
 DATABASE = args.database
 LOG_FILENAME = os.path.join(args.logdir, DATABASE, 'res.jsonl')
+
+# [新增] 自动创建日志目录
+os.makedirs(os.path.dirname(LOG_FILENAME), exist_ok=True)
+
 history = set()
-with open(LOG_FILENAME, 'r') as fin:
-    for line in fin.readlines():
-        obj = json.loads(line)
-        history.add(obj['name'])
+# [新增] 先检查文件是否存在，再读取（防止第一次运行报错）
+if os.path.exists(LOG_FILENAME):
+    with open(LOG_FILENAME, 'r') as fin:
+        for line in fin.readlines():
+            obj = json.loads(line)
+            history.add(obj['name'])
+
 out_file = jsonlines.open(LOG_FILENAME, "a")
 out_file._flush = True
 
@@ -85,8 +92,17 @@ if DATASET == 'calcite':
             out_file.write(out_dict)
 else:
     queries_path = os.path.join('..', DATASET)
+
+    # [新增] 自动检测 queries 子文件夹
+    if os.path.isdir(os.path.join(queries_path, 'queries')):
+        queries_path = os.path.join(queries_path, 'queries')
+
     query_templates = os.listdir(queries_path)
     for template in query_templates:
+        # [新增] 跳过非文件夹
+        if not os.path.isdir(os.path.join(queries_path, template)):
+            continue
+
         max_idx = 1 if args.large else 2
         for idx in range(max_idx):
             query_filename = f'{queries_path}/{template}/{template}_{idx}.sql'

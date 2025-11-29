@@ -45,6 +45,10 @@ else:
 
 LOG_DIR = os.path.join(args.logdir, DATASET)
 
+# [新增] 自动创建日志目录，防止 FileNotFoundError
+if not os.path.exists(LOG_DIR):
+    os.makedirs(LOG_DIR)
+
 pg_args = DBArgs(pg_config)
 
 schema_path = os.path.join('..', DATASET, 'create_tables.sql')
@@ -75,8 +79,18 @@ if DATASET == 'calcite':
             llm_only_rewrite(query, schema, pg_args, REWRITE_ROUNDS=REWRITE_ROUNDS)
 else:
     queries_path = os.path.join('..', DATASET)
+
+    # [新增] 如果发现有个 queries 子文件夹，就自动进到里面去找查询
+    if os.path.isdir(os.path.join(queries_path, 'queries')):
+        queries_path = os.path.join(queries_path, 'queries')
+        print(f"Detected 'queries' folder, changing queries_path to: {queries_path}")
+
     query_templates = os.listdir(queries_path)
     for template in query_templates:
+        # [保留] 依然加上这个判断，防止读取到 create_tables.sql 或其他杂文件
+        if not os.path.isdir(os.path.join(queries_path, template)):
+            continue
+
         for idx in range(2):
             query_filename = f'{queries_path}/{template}/{template}_{idx}.sql'
             content = open(query_filename, 'r').read()
@@ -86,7 +100,8 @@ else:
                 # Remove all handlers associated with the root logger object.
                 for handler in logging.root.handlers[:]:
                     logging.root.removeHandler(handler)
-                log_filename = f'{LOG_DIR}/{template}_{idx}.log' if len(queries) == 1 else f'{LOG_DIR}/{template}_{idx}_{j}.log'
+                log_filename = f'{LOG_DIR}/{template}_{idx}.log' if len(
+                    queries) == 1 else f'{LOG_DIR}/{template}_{idx}_{j}.log'
                 if os.path.exists(log_filename):
                     continue
                 logging.basicConfig(filename=log_filename,
@@ -94,7 +109,7 @@ else:
                                     format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
                                     datefmt='%H:%M:%S',
                                     level=logging.DEBUG)
-                
+
                 db = Database(pg_args)
                 input_cost = db.cost_estimation(query)
                 logging.info(f'Input Cost: {input_cost}')

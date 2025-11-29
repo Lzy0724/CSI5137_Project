@@ -5,7 +5,10 @@ import argparse
 import re
 import json
 
-sys.path.append('..')
+# 1. 获取项目根目录
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(project_root)
+
 from my_rewriter.config import init_llms, init_db_config
 
 parser = argparse.ArgumentParser()
@@ -39,39 +42,63 @@ elif 'hbom' in DATABASE:
 else:
     DATASET = DATABASE
 
-LOG_DIR = os.path.join(args.logdir, DATASET)
+# 2. 使用绝对路径
+LOG_DIR = os.path.join(project_root, args.logdir, DATASET)
+# 确保日志目录存在
+os.makedirs(LOG_DIR, exist_ok=True)
 
 pg_args = DBArgs(pg_config)
 
-schema_path = os.path.join('..', DATASET, 'create_tables.sql')
-schema = open(schema_path, 'r').read()
+schema_path = os.path.join(project_root, DATASET, 'create_tables.sql')
+if not os.path.exists(schema_path):
+    print(f"错误: 找不到 schema 文件: {schema_path}")
+    exit(1)
+schema = open(schema_path, 'r', encoding='utf-8').read()
 
 docstore = init_docstore()
 
 if DATASET == 'calcite':
-    queries_path = os.path.join('..', DATASET, f'{DATASET}.jsonl')
-    with open(queries_path, 'r') as fin:
+    queries_path = os.path.join(project_root, DATASET, f'{DATASET}.jsonl')
+    with open(queries_path, 'r', encoding='utf-8') as fin:
         for line in fin.readlines():
             obj = json.loads(line)
             query = obj['input_sql']
             name = sorted([x['name'] for x in obj['rewrites']])[0]
-            test(name, query, schema, pg_args, model_args, docstore, LOG_DIR, RETRIEVER_TOP_K=RETRIEVER_TOP_K, CASE_BATCH=CASE_BATCH, RULE_BATCH=RULE_BATCH, REWRITE_ROUNDS=REWRITE_ROUNDS, index=args.index)
+            test(name, query, schema, pg_args, model_args, docstore, LOG_DIR, RETRIEVER_TOP_K=RETRIEVER_TOP_K,
+                 CASE_BATCH=CASE_BATCH, RULE_BATCH=RULE_BATCH, REWRITE_ROUNDS=REWRITE_ROUNDS, index=args.index)
 elif DATASET == 'hbom':
-    queries_filename = os.path.join('..', DATASET, 'queries.sql')
-    content = open(queries_filename, 'r').read()
+    queries_filename = os.path.join(project_root, DATASET, 'queries.sql')
+    content = open(queries_filename, 'r', encoding='utf-8').read()
     queries = [q.strip() + ';' for q in content.split(';') if q.strip()]
     for j, query in enumerate(queries):
         name = f'query{j}'
-        test(name, query, schema, pg_args, model_args, docstore, LOG_DIR, RETRIEVER_TOP_K=RETRIEVER_TOP_K, CASE_BATCH=CASE_BATCH, RULE_BATCH=RULE_BATCH, REWRITE_ROUNDS=REWRITE_ROUNDS, index=args.index)
+        test(name, query, schema, pg_args, model_args, docstore, LOG_DIR, RETRIEVER_TOP_K=RETRIEVER_TOP_K,
+             CASE_BATCH=CASE_BATCH, RULE_BATCH=RULE_BATCH, REWRITE_ROUNDS=REWRITE_ROUNDS, index=args.index)
 else:
-    queries_path = os.path.join('..', DATASET)
+    # 3. 更新查询路径到 queries 子目录
+    queries_path = os.path.join(project_root, DATASET, 'queries')
+    if not os.path.exists(queries_path):
+        # 兼容旧结构：如果 queries 子目录不存在，尝试直接在 DATASET 目录下找
+        queries_path = os.path.join(project_root, DATASET)
+
+    if not os.path.exists(queries_path):
+        print(f"错误: 找不到查询目录: {queries_path}")
+        exit(1)
+
     query_templates = os.listdir(queries_path)
+    # 过滤掉非目录（如果 queries_path 包含文件）
+    query_templates = [t for t in query_templates if os.path.isdir(os.path.join(queries_path, t))]
+
     for template in query_templates:
         for idx in range(2):
-            query_filename = f'{queries_path}/{template}/{template}_{idx}.sql'
-            content = open(query_filename, 'r').read()
+            query_filename = os.path.join(queries_path, template, f'{template}_{idx}.sql')
+            if not os.path.exists(query_filename):
+                continue
+
+            content = open(query_filename, 'r', encoding='utf-8').read()
             content = re.sub(r'--.*\n', '', content)
             queries = [q.strip() + ';' for q in content.split(';') if q.strip()]
             for j, query in enumerate(queries):
                 name = f'{template}_{idx}' if len(queries) == 1 else f'{template}_{idx}_{j}'
-                test(name, query, schema, pg_args, model_args, docstore, LOG_DIR, RETRIEVER_TOP_K=RETRIEVER_TOP_K, CASE_BATCH=CASE_BATCH, RULE_BATCH=RULE_BATCH, REWRITE_ROUNDS=REWRITE_ROUNDS, index=args.index)
+                test(name, query, schema, pg_args, model_args, docstore, LOG_DIR, RETRIEVER_TOP_K=RETRIEVER_TOP_K,
+                     CASE_BATCH=CASE_BATCH, RULE_BATCH=RULE_BATCH, REWRITE_ROUNDS=REWRITE_ROUNDS, index=args.index)

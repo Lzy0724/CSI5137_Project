@@ -1,11 +1,25 @@
+import os
+
 from llama_index.core import Settings
 from llama_index.llms.openai import OpenAI
 from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
-from llama_index.llms.openai_like import OpenAILike
 
-CACHE_PATH = 'cache'
-CASE_RULES_PATH = 'stackoverflow-rewrite-rules-query-optimization.jsonl'
+# 获取当前脚本 (config.py) 所在的目录，即 my_rewriter 目录
+current_dir = os.path.dirname(os.path.abspath(__file__))
+# 获取项目根目录 (my_rewriter 的上一级)
+project_root = os.path.dirname(current_dir)
+
+# 使用绝对路径定义 CACHE_PATH (假设 cache 在项目根目录)
+CACHE_PATH = os.path.join(project_root, 'cache')
+
+# 使用绝对路径定义 CASE_RULES_PATH
+# 假设这个 jsonl 文件在 my_rewriter 目录下：
+CASE_RULES_PATH = os.path.join(current_dir, 'stackoverflow-rewrite-rules-query-optimization.jsonl')
+
+# 【注意】：如果你的 jsonl 文件实际上是在项目根目录（LLM4Rewrite 下），请改用下面这行：
+# CASE_RULES_PATH = os.path.join(project_root, 'stackoverflow-rewrite-rules-query-optimization.jsonl')
+
 
 def init_llms(model_type: str = '', load_model=True) -> dict[str, str]:
     if 'open' in model_type:
@@ -24,13 +38,9 @@ def init_llms(model_type: str = '', load_model=True) -> dict[str, str]:
     
     if 'open' in model_type:
         if load_model:
-            Settings.llm = OpenAILike(
-                model="DeepSeek-R1-Distill-32B",
-                api_key="",
-                api_base="",
-                context_window=131072,
-                is_chat_model=True,
-                tokenizer='DeepSeek-R1-Distill-32B'
+            Settings.llm = OpenAI(
+                model="gpt-5",
+                api_key=os.getenv("OPENAI_API_KEY"),
             )
     elif 'gpt3' in model_type:
         if load_model:
@@ -69,10 +79,10 @@ def init_llms(model_type: str = '', load_model=True) -> dict[str, str]:
 
 def init_db_config(database: str) -> dict[str, str]:
     return {
-        'host': '',
+        'host': 'localhost',
         'port': 5432,
-        'user': '',
-        'password': '',
+        'user': 'postgres',
+        'password': 'Lzy990724@',
         'dbname': database,
         'db': 'postgresql'
     }

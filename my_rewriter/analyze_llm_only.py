@@ -62,7 +62,7 @@ def analyze(query: str, name: str) -> dict:
         input_cost = float("inf")
     if args.compute_latency:
         if args.large:
-            input_latency = actual_time_once(query, pg_args, 3600)
+            input_latency = actual_time_once(query, pg_args, 300)
         else:
             input_latency, input_var = actual_time(query, pg_args, 300)
     
@@ -94,7 +94,7 @@ def analyze(query: str, name: str) -> dict:
                             res['output_var'] = [input_latency] * 5
                     else:
                         if args.large:
-                            output_latency = actual_time_once(res['output_sql'], pg_args, 3600)
+                            output_latency = actual_time_once(res['output_sql'], pg_args, 300)
                         else:
                             output_latency, output_var = actual_time(res['output_sql'], pg_args, 300)
                         res['output_latency'] = output_latency
@@ -135,13 +135,29 @@ if DATASET == 'calcite':
 
             rewrite_obj = analyze(query, name)
             template_rewrites.append(rewrite_obj)
+
 else:
     queries_path = os.path.join('..', DATASET)
+
+    # [新增] 自动检测 queries 子文件夹（适配你的目录结构）
+    if os.path.isdir(os.path.join(queries_path, 'queries')):
+        queries_path = os.path.join(queries_path, 'queries')
+
     query_templates = os.listdir(queries_path)
     for template in tqdm(query_templates):
+        # [新增] 跳过 create_tables.sql 等非文件夹文件
+        if not os.path.isdir(os.path.join(queries_path, template)):
+            continue
+
         max_idx = 1 if args.large else 2
         for idx in range(max_idx):
             query_filename = f'{queries_path}/{template}/{template}_{idx}.sql'
+
+            # [新增] 增加文件存在性检查，防止报错
+            if not os.path.exists(query_filename):
+                print(f"Warning: File not found {query_filename}, skipping...")
+                continue
+
             content = open(query_filename, 'r').read()
             content = re.sub(r'--.*\n', '', content)
             queries = [q.strip() + ';' for q in content.split(';') if q.strip()]

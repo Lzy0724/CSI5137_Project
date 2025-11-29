@@ -1,10 +1,15 @@
 import logging
 import sys
+import os
 from typing import Any, Dict, List, Optional, Sequence, Union, cast, Tuple
 import typing as t
 from collections import defaultdict
 import json
 import itertools
+
+# 1. 获取项目根目录
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(project_root)
 
 import chromadb
 from llama_index.core import VectorStoreIndex, StorageContext, Settings
@@ -26,30 +31,42 @@ from rag.my_structure_retriever import MyStructureRetriever
 from rag.prompts import STACKOVERFLOW_QA_PROMPT
 from rag.gen_rewrites_from_rules import gen_rewrites_from_rules
 
+
 def init_docstore() -> SimpleDocumentStore:
     docstore = SimpleDocumentStore()
 
     def read_docs(filename: str) -> Sequence[BaseNode]:
         doc_nodes = []
-        with open(filename, 'r') as fin:
+        if not os.path.exists(filename):
+            print(f"警告: 找不到文档文件: {filename}")
+            return []
+
+        with open(filename, 'r', encoding='utf-8') as fin:
             for line in fin.readlines():
                 obj = json.loads(line)
                 myid = f'{obj["id"]}-{obj["answer_id"]}'
-                doc = STACKOVERFLOW_QA_PROMPT.format(title=obj["question_title"], question_body=obj["question_body"], answer_body=obj["answer_body"])
+                doc = STACKOVERFLOW_QA_PROMPT.format(title=obj["question_title"], question_body=obj["question_body"],
+                                                     answer_body=obj["answer_body"])
                 text_node = TextNode(
-                    text=doc, 
-                    id_ = myid
+                    text=doc,
+                    id_=myid
                 )
                 doc_nodes.append(text_node)
         return doc_nodes
 
-    doc_nodes = read_docs('../rag/stackoverflow-rewrite-query-optimization.jsonl')
+    # 2. 使用绝对路径
+    jsonl_path = os.path.join(project_root, 'rag', 'stackoverflow-rewrite-query-optimization.jsonl')
+    doc_nodes = read_docs(jsonl_path)
     docstore.add_documents(doc_nodes)
     return docstore
 
-def rag_retrieve(query: str, schema: str, docstore: SimpleDocumentStore, embed_dim: int, RETRIEVER_TOP_K: int = 10) -> Dict:
+
+def rag_retrieve(query: str, schema: str, docstore: SimpleDocumentStore, embed_dim: int,
+                 RETRIEVER_TOP_K: int = 10) -> Dict:
     # initialize client
-    db = chromadb.PersistentClient(path="../rag/chroma_db")
+    # 3. 使用绝对路径
+    chroma_db_path = os.path.join(project_root, 'rag', 'chroma_db')
+    db = chromadb.PersistentClient(path=chroma_db_path)
 
     # get collection
     stackoverflow_chroma_collection = db.get_or_create_collection("stackoverflow")
@@ -65,14 +82,19 @@ def rag_retrieve(query: str, schema: str, docstore: SimpleDocumentStore, embed_d
 
     stackoverflow_retriever = stackoverflow_index.as_retriever(similarity_top_k=RETRIEVER_TOP_K)
 
-    retriever = MyQueryFusionRetriever(docstore=docstore, qa_retriever=stackoverflow_retriever, schema=schema, embed_dim=embed_dim, mode=FUSION_MODES.RECIPROCAL_RANK, similarity_top_k=RETRIEVER_TOP_K, use_async=False, verbose=True)
+    retriever = MyQueryFusionRetriever(docstore=docstore, qa_retriever=stackoverflow_retriever, schema=schema,
+                                       embed_dim=embed_dim, mode=FUSION_MODES.RECIPROCAL_RANK,
+                                       similarity_top_k=RETRIEVER_TOP_K, use_async=False, verbose=True)
     retriever_res = retriever.retrieve(query)
     logging.info('Retrieved Rewrite Cases: ' + str(retriever_res))
     return {"retriever_res": retriever_res, "rewrites": retriever._queries}
 
+
 def rag_semantics_retrieve(query: str, schema: str, docstore: SimpleDocumentStore, RETRIEVER_TOP_K: int = 10) -> Dict:
     # initialize client
-    db = chromadb.PersistentClient(path="../rag/chroma_db")
+    # 4. 使用绝对路径
+    chroma_db_path = os.path.join(project_root, 'rag', 'chroma_db')
+    db = chromadb.PersistentClient(path=chroma_db_path)
 
     # get collection
     stackoverflow_chroma_collection = db.get_or_create_collection("stackoverflow_summary")
@@ -100,9 +122,13 @@ def rag_semantics_retrieve(query: str, schema: str, docstore: SimpleDocumentStor
     rewrites, _ = gen_rewrites_from_rules(sql=query, schema=schema, fun=achat, verbose=True)
     return {"retriever_res": node_with_scores, "rewrites": rewrites}
 
-def rag_structure_retrieve(query: str, schema: str, docstore: SimpleDocumentStore, embed_dim: int, RETRIEVER_TOP_K: int = 10) -> Dict:
+
+def rag_structure_retrieve(query: str, schema: str, docstore: SimpleDocumentStore, embed_dim: int,
+                           RETRIEVER_TOP_K: int = 10) -> Dict:
     # initialize client
-    db = chromadb.PersistentClient(path="../rag/chroma_db")
+    # 5. 使用绝对路径
+    chroma_db_path = os.path.join(project_root, 'rag', 'chroma_db')
+    db = chromadb.PersistentClient(path=chroma_db_path)
 
     # get collection
     stackoverflow_chroma_collection = db.get_or_create_collection("stackoverflow_structure")
@@ -118,7 +144,9 @@ def rag_structure_retrieve(query: str, schema: str, docstore: SimpleDocumentStor
 
     stackoverflow_retriever = stackoverflow_index.as_retriever(similarity_top_k=RETRIEVER_TOP_K)
 
-    retriever = MyStructureRetriever(docstore=docstore, qa_retriever=stackoverflow_retriever, embed_dim=embed_dim, schema=schema, mode=FUSION_MODES.RECIPROCAL_RANK, similarity_top_k=RETRIEVER_TOP_K, use_async=False, verbose=True)
+    retriever = MyStructureRetriever(docstore=docstore, qa_retriever=stackoverflow_retriever, embed_dim=embed_dim,
+                                     schema=schema, mode=FUSION_MODES.RECIPROCAL_RANK, similarity_top_k=RETRIEVER_TOP_K,
+                                     use_async=False, verbose=True)
     retriever_res = retriever.retrieve(query)
     logging.info('Retrieved Rewrite Cases: ' + str(retriever_res))
     return {"retriever_res": retriever_res, "rewrites": retriever._queries}

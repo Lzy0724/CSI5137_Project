@@ -54,7 +54,7 @@ def analyze(name: str) -> dict:
     input_sql = obj['input_sql']
     if args.compute_latency:
         if args.large:
-            input_latency = actual_time_once(input_sql, pg_args, 3600)
+            input_latency = actual_time_once(input_sql, pg_args, 300)
         else:
             input_latency, input_var = actual_time(input_sql, pg_args, 300)
     input_cost = float(obj['input_cost'])
@@ -69,7 +69,7 @@ def analyze(name: str) -> dict:
     else:
         if args.compute_latency:
             if args.large:
-                output_latency = actual_time_once(output_sql, pg_args, 3600)
+                output_latency = actual_time_once(output_sql, pg_args, 300)
             else:
                 output_latency, output_var = actual_time(output_sql, pg_args, 300)
     output_cost = float(obj['output_cost'])
@@ -117,11 +117,21 @@ if DATASET == 'calcite':
             template_rewrites.append(rewrite_obj)
 else:
     queries_path = os.path.join('..', DATASET)
+
+    # [新增] 自动检测 queries 子文件夹（适配你的目录结构）
+    if os.path.isdir(os.path.join(queries_path, 'queries')):
+        queries_path = os.path.join(queries_path, 'queries')
+
     query_templates = os.listdir(queries_path)
     for template in tqdm(query_templates):
+        # [新增] 跳过 create_tables.sql 等非文件夹文件
+        if not os.path.isdir(os.path.join(queries_path, template)):
+            continue
+
         max_idx = 1 if args.large else 2
         for idx in range(max_idx):
             query_filename = f'{queries_path}/{template}/{template}_{idx}.sql'
+            # ... (后续代码保持不变)
             content = open(query_filename, 'r').read()
             content = re.sub(r'--.*\n', '', content)
             queries = [q.strip() + ';' for q in content.split(';') if q.strip()]
