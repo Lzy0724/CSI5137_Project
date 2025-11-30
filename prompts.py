@@ -19,7 +19,6 @@ SQL Query:
 
 Query Rewrite Cases:
 {cases}'''
-
 SELECT_CASE_RULE_SYS_PROMPT = '''You will be provided with a query rewrite case, and a list of SQL query rewrite rules. Your task is to identify the query rewrite rules that were applied in the query rewrite case. Follow these steps:
 
 Step 1: For each provided SQL query rewrite rule, examine whether or not the query rewrite case applies the rule. Note that a query rewrite rule cannot be applied inversely.
