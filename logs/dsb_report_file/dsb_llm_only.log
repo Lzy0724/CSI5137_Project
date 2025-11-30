@@ -1,0 +1,18 @@
+06:48:50,949 root INFO Improvements:
++------------+---------------------+---------------------+----------------------+
+|  Template  |        Input        |        Output       |        Rules         |
++------------+---------------------+---------------------+----------------------+
+| query054_1 | 0.06166666666666667 | 0.05733333333333334 | ['FILTER_INTO_JOIN'] |
++------------+---------------------+---------------------+----------------------+
+06:48:50,949 root INFO Improved 1 out of 76 queries
+06:48:50,949 root INFO Average: 0.0651359649122807
+06:48:50,949 root INFO Median: 0.059
+06:48:50,949 root INFO 90th Percentile: 0.10066666666666667
+06:48:50,949 root INFO 95th Percentile: 0.136
+06:48:50,949 root INFO Average Input: 0.06478508771929825
+06:48:50,955 root INFO Median Input: 0.05933333333333333
+06:48:50,955 root INFO 90th Percentile Input: 0.10066666666666667
+06:48:50,955 root INFO 95th Percentile Input: 0.13433333333333333
+06:48:50,955 root INFO Average LLM Time: 8197.368421052632
+06:48:50,955 root INFO Average Rewrite Time: 39.973684210526315
+06:48:50,955 root INFO Average Total Time: 8237.342105263158

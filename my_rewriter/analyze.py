@@ -201,7 +201,7 @@ def analyze(query: str, name: str) -> dict:
             0]
         final_res['best_index'] = best_idx
     else:
-        final_res['best_index'] = -1  
+        final_res['best_index'] = -1
 
     return final_res
 

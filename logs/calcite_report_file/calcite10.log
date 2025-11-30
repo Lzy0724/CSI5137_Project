@@ -1,0 +1,28 @@
+02:47:02,219 root INFO Improvements:
++-----------------------------------------------------------+----------------------+-----------------------+-----------------------------------------------------+
+|                          Template                         |        Input         |         Output        |                        Rules                        |
++-----------------------------------------------------------+----------------------+-----------------------+-----------------------------------------------------+
+| testNotPushFilterPastWindowWhenPredicateNotOnPartitionKey | 0.044000000000000004 |         0.031         |                  ['PROJECT_REMOVE']                 |
+|                    testIsNullPushDown2                    |         0.01         | 0.0003333333333333333 |   ['FILTER_REDUCE_EXPRESSIONS', 'PROJECT_REMOVE']   |
+|             testReduceConstantsNegatedInverted            | 0.011333333333333334 |         0.001         |            ['FILTER_REDUCE_EXPRESSIONS']            |
+|               testWhereAnyCorrelatedInSelect              |        0.013         |  0.010666666666666666 |          ['FILTER_SUB_QUERY_TO_CORRELATE']          |
+|                 testReduceConstantsNegated                | 0.013666666666666667 |         0.001         |            ['FILTER_REDUCE_EXPRESSIONS']            |
+|                     testIsNullPushDown                    | 0.034333333333333334 | 0.0003333333333333333 |   ['FILTER_REDUCE_EXPRESSIONS', 'PROJECT_REMOVE']   |
+|                  testReduceValuesToEmpty                  | 0.004666666666666667 |         0.001         |               ['FILTER_VALUES_MERGE']               |
+|            testExistsWithAtLeastOneRowSubQuery            | 0.011333333333333334 |         0.009         | ['FILTER_SUB_QUERY_TO_CORRELATE', 'PROJECT_REMOVE'] |
+|                     testEmptyIntersect                    | 0.005333333333333333 |         0.001         |  ['PROJECT_FILTER_VALUES_MERGE', 'PROJECT_REMOVE']  |
+|        testMinReuseDistinctAttrWithMixedOptionality       | 0.034666666666666665 |  0.03133333333333333  |             ['AGGREGATE_PROJECT_MERGE']             |
++-----------------------------------------------------------+----------------------+-----------------------+-----------------------------------------------------+
+02:47:02,219 root INFO Improved 10 out of 43 queries
+02:47:02,219 root INFO Average: 0.022798449612403102
+02:47:02,219 root INFO Median: 0.018333333333333333
+02:47:02,219 root INFO 90th Percentile: 0.06033333333333333
+02:47:02,219 root INFO 95th Percentile: 0.06666666666666667
+02:47:02,219 root INFO Average Input: 0.016449612403100777
+02:47:02,219 root INFO Median Input: 0.013333333333333334
+02:47:02,219 root INFO 90th Percentile Input: 0.034333333333333334
+02:47:02,219 root INFO 95th Percentile Input: 0.035333333333333335
+02:47:02,219 root INFO Average Retrieval Time: 6534.883720930233
+02:47:02,219 root INFO Average Arrange Time: 18616.226301636805
+02:47:02,219 root INFO Average Rewrite Time: 12.767441860465116
+02:47:02,219 root INFO Average Total Time: 25163.877464427504

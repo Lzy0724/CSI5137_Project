@@ -1,0 +1,15 @@
+06:56:46,10 root INFO Improvements:
++----------+-------+--------+-------+
+| Template | Input | Output | Rules |
++----------+-------+--------+-------+
++----------+-------+--------+-------+
+06:56:46,10 root INFO Improved 0 out of 76 queries
+06:56:46,10 root INFO Average: 0.06521929824561404
+06:56:46,10 root INFO Median: 0.059666666666666666
+06:56:46,10 root INFO 90th Percentile: 0.10066666666666667
+06:56:46,10 root INFO 95th Percentile: 0.13433333333333333
+06:56:46,10 root INFO Average Input: 0.06478508771929825
+06:56:46,10 root INFO Median Input: 0.05933333333333333
+06:56:46,10 root INFO 90th Percentile Input: 0.10066666666666667
+06:56:46,10 root INFO 95th Percentile Input: 0.13433333333333333
+06:56:46,10 root INFO Average Total Time: 3440.8289473684213

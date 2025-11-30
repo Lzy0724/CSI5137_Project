@@ -1,0 +1,31 @@
+02:53:43,590 root INFO Improvements:
++------------------------------------------------+----------------------+----------------------+------------------------------------------------------------------------+
+|                    Template                    |        Input         |        Output        |                                 Rules                                  |
++------------------------------------------------+----------------------+----------------------+------------------------------------------------------------------------+
+|                testEmptyProject                | 0.004666666666666667 |        0.001         |                        ['FILTER_VALUES_MERGE']                         |
+|            testDistinctWithGrouping            | 0.03266666666666667  |         0.01         |                ['AGGREGATE_EXPAND_DISTINCT_AGGREGATES']                |
+|       testReduceConstantsNegatedInverted       | 0.011333333333333334 |        0.001         |                     ['FILTER_REDUCE_EXPRESSIONS']                      |
+|         testWhereAnyCorrelatedInSelect         |        0.013         | 0.010666666666666666 |                   ['FILTER_SUB_QUERY_TO_CORRELATE']                    |
+|           testReduceConstantsNegated           | 0.013666666666666667 |        0.001         |                     ['FILTER_REDUCE_EXPRESSIONS']                      |
+|  testMaxReuseDistinctAttrWithMixedOptionality  | 0.024333333333333332 | 0.014333333333333332 | ['AGGREGATE_EXPAND_DISTINCT_AGGREGATES', 'AGGREGATE_REDUCE_FUNCTIONS'] |
+|     testSumAndDistinctSumWithExpandSumType     | 0.020666666666666667 | 0.017333333333333333 |                ['AGGREGATE_EXPAND_DISTINCT_AGGREGATES']                |
+|            testReduceValuesToEmpty             | 0.004666666666666667 |        0.001         |                        ['FILTER_VALUES_MERGE']                         |
+| testBitOrReuseDistinctAttrWithMixedOptionality | 0.027999999999999997 | 0.015333333333333332 |                ['AGGREGATE_EXPAND_DISTINCT_AGGREGATES']                |
+|            testAggregateJoinRemove5            | 0.043666666666666666 | 0.028333333333333332 |                ['AGGREGATE_EXPAND_DISTINCT_AGGREGATES']                |
+|       testDistinctCountWithExpandSumType       | 0.035333333333333335 | 0.013666666666666667 |                ['AGGREGATE_EXPAND_DISTINCT_AGGREGATES']                |
+|            testRemoveDistinctOnAgg             | 0.025333333333333333 | 0.011000000000000001 |            ['AGGREGATE_EXPAND_DISTINCT_AGGREGATES_TO_JOIN']            |
+|          testExpandProjectInNullable           |        0.013         | 0.007333333333333333 |                                   []                                   |
+|  testMinReuseDistinctAttrWithMixedOptionality  | 0.034666666666666665 |        0.013         | ['AGGREGATE_EXPAND_DISTINCT_AGGREGATES', 'AGGREGATE_REDUCE_FUNCTIONS'] |
++------------------------------------------------+----------------------+----------------------+------------------------------------------------------------------------+
+02:53:43,598 root INFO Improved 14 out of 44 queries
+02:53:43,598 root INFO Average: 0.014227272727272727
+02:53:43,598 root INFO Median: 0.012333333333333333
+02:53:43,598 root INFO 90th Percentile: 0.02866666666666667
+02:53:43,598 root INFO 95th Percentile: 0.034333333333333334
+02:53:43,598 root INFO Average Input: 0.016181818181818183
+02:53:43,598 root INFO Median Input: 0.013333333333333334
+02:53:43,598 root INFO 90th Percentile Input: 0.034333333333333334
+02:53:43,598 root INFO 95th Percentile Input: 0.035333333333333335
+02:53:43,598 root INFO Average LLM Time: 6272.727272727273
+02:53:43,598 root INFO Average Rewrite Time: 26.272727272727273
+02:53:43,598 root INFO Average Total Time: 6299.0

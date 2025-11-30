@@ -1,0 +1,24 @@
+06:22:58,299 root INFO Improvements:
++------------+---------------------+----------------------+------------------------------------------------------------------------------------------------------------------------------------+
+|  Template  |        Input        |        Output        |                                                               Rules                                                                |
++------------+---------------------+----------------------+------------------------------------------------------------------------------------------------------------------------------------+
+| query014_0 | 0.09066666666666667 | 0.04033333333333333  | ['FILTER_SUB_QUERY_TO_CORRELATE', 'FILTER_REDUCE_EXPRESSIONS', 'FILTER_INTO_JOIN', 'PROJECT_REMOVE', 'SORT_REMOVE_CONSTANT_KEYS']  |
+| query014_1 | 0.08866666666666667 | 0.030666666666666665 | ['FILTER_INTO_JOIN', 'FILTER_SUB_QUERY_TO_CORRELATE', 'PROJECT_REDUCE_EXPRESSIONS', 'PROJECT_REMOVE', 'SORT_REMOVE_CONSTANT_KEYS'] |
+| query058_1 |        0.136        | 0.09466666666666668  |             ['FILTER_INTO_JOIN', 'FILTER_SUB_QUERY_TO_CORRELATE', 'AGGREGATE_PROJECT_MERGE', 'SORT_PROJECT_TRANSPOSE']             |
+| query081_1 | 0.09100000000000001 | 0.07233333333333333  |                                    ['FILTER_SUB_QUERY_TO_CORRELATE', 'AGGREGATE_PROJECT_MERGE']                                    |
+| query094_0 | 0.06966666666666667 | 0.052333333333333336 |            ['FILTER_SUB_QUERY_TO_CORRELATE', 'AGGREGATE_EXPAND_DISTINCT_AGGREGATES_TO_JOIN', 'AGGREGATE_PROJECT_MERGE']            |
+| query094_1 | 0.08066666666666666 | 0.052333333333333336 |            ['FILTER_SUB_QUERY_TO_CORRELATE', 'AGGREGATE_PROJECT_MERGE', 'AGGREGATE_EXPAND_DISTINCT_AGGREGATES_TO_JOIN']            |
++------------+---------------------+----------------------+------------------------------------------------------------------------------------------------------------------------------------+
+06:22:58,299 root INFO Improved 6 out of 76 queries
+06:22:58,299 root INFO Average: 0.06443421052631579
+06:22:58,299 root INFO Median: 0.06033333333333333
+06:22:58,299 root INFO 90th Percentile: 0.09833333333333333
+06:22:58,299 root INFO 95th Percentile: 0.13033333333333333
+06:22:58,299 root INFO Average Input: 0.06478508771929825
+06:22:58,299 root INFO Median Input: 0.05933333333333333
+06:22:58,299 root INFO 90th Percentile Input: 0.10066666666666667
+06:22:58,299 root INFO 95th Percentile Input: 0.13433333333333333
+06:22:58,299 root INFO Average Retrieval Time: 11736.842105263158
+06:22:58,299 root INFO Average Arrange Time: 25407.12207555771
+06:22:58,299 root INFO Average Rewrite Time: 44.31578947368421
+06:22:58,299 root INFO Average Total Time: 37188.279970294556
