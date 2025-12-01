@@ -11,7 +11,6 @@ import argparse
 import re
 from collections import defaultdict
 
-# 1. 获取项目根目录 (放在最前面，方便后续使用)
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(project_root)  # 确保能导入项目模块
 
@@ -42,7 +41,6 @@ elif 'dsb' in args.database:
 else:
     DATASET = args.database
 
-# 2. 修复 LOG_DIR 为绝对路径
 LOG_DIR = os.path.join(project_root, args.logdir, DATASET)
 
 
@@ -63,13 +61,10 @@ def is_improved(t: t.Dict, idx: int, compute_latency: bool) -> bool:
 
 
 def _analyze(name: str, input_latency: float) -> dict:
-    # 3. 使用 os.path.join 拼接日志路径
     log_filename = os.path.join(LOG_DIR, f'{name}.log')
 
-    # 4. 增加文件存在性检查
     if not os.path.exists(log_filename):
         print(f"警告: 找不到日志文件 {log_filename}。请确保你已经运行了重写脚本。")
-        # 返回一个空结果以避免崩溃，或者你可以选择在这里 raise Exception
         return {'template': name, 'time': {'retrieval': 0, 'arrange': 0, 'rewrite': 0}, 'rewrites': []}
 
     retrieval_start = None
@@ -81,7 +76,6 @@ def _analyze(name: str, input_latency: float) -> dict:
     rewrite_res = []
     model = MyModel(model_args)
 
-    # 5. 指定编码 utf-8
     with open(log_filename, 'r', encoding='utf-8') as f:
         lines = list(f.readlines())
         if not lines:
@@ -211,7 +205,6 @@ schema_path = os.path.join(project_root, args.database, 'create_tables.sql')
 analyze_log_filename = f'{args.logdir}/{args.database}.log' if not args.no_reflection else f'{args.logdir}/{args.database}_no_reflection.log'
 analyze_log_filename = os.path.join(project_root, analyze_log_filename)
 
-# 确保日志目录存在
 os.makedirs(os.path.dirname(analyze_log_filename), exist_ok=True)
 
 logging.basicConfig(filename=analyze_log_filename,
@@ -233,7 +226,6 @@ if DATASET == 'calcite':
             if rewrite_obj['best_index'] != -1:  # 只添加有效结果
                 template_rewrites.append(rewrite_obj)
 else:
-    # 指向 dsb 下的 queries 文件夹
     queries_path = os.path.join(project_root, args.database, 'queries')
     if not os.path.exists(queries_path):
         print(f"错误: 查询目录不存在 {queries_path}")

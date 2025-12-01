@@ -45,7 +45,6 @@ else:
 
 LOG_DIR = os.path.join(args.logdir, DATASET)
 
-# [新增] 自动创建日志目录，防止 FileNotFoundError
 if not os.path.exists(LOG_DIR):
     os.makedirs(LOG_DIR)
 
@@ -80,14 +79,12 @@ if DATASET == 'calcite':
 else:
     queries_path = os.path.join('..', DATASET)
 
-    # [新增] 如果发现有个 queries 子文件夹，就自动进到里面去找查询
     if os.path.isdir(os.path.join(queries_path, 'queries')):
         queries_path = os.path.join(queries_path, 'queries')
         print(f"Detected 'queries' folder, changing queries_path to: {queries_path}")
 
     query_templates = os.listdir(queries_path)
     for template in query_templates:
-        # [保留] 依然加上这个判断，防止读取到 create_tables.sql 或其他杂文件
         if not os.path.isdir(os.path.join(queries_path, template)):
             continue
 
