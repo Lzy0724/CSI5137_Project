@@ -7,7 +7,6 @@ from collections import defaultdict
 import json
 import itertools
 
-# 1. 获取项目根目录
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(project_root)
 
@@ -54,7 +53,6 @@ def init_docstore() -> SimpleDocumentStore:
                 doc_nodes.append(text_node)
         return doc_nodes
 
-    # 2. 使用绝对路径
     jsonl_path = os.path.join(project_root, 'rag', 'stackoverflow-rewrite-query-optimization.jsonl')
     doc_nodes = read_docs(jsonl_path)
     docstore.add_documents(doc_nodes)
@@ -64,7 +62,6 @@ def init_docstore() -> SimpleDocumentStore:
 def rag_retrieve(query: str, schema: str, docstore: SimpleDocumentStore, embed_dim: int,
                  RETRIEVER_TOP_K: int = 10) -> Dict:
     # initialize client
-    # 3. 使用绝对路径
     chroma_db_path = os.path.join(project_root, 'rag', 'chroma_db')
     db = chromadb.PersistentClient(path=chroma_db_path)
 
@@ -92,7 +89,6 @@ def rag_retrieve(query: str, schema: str, docstore: SimpleDocumentStore, embed_d
 
 def rag_semantics_retrieve(query: str, schema: str, docstore: SimpleDocumentStore, RETRIEVER_TOP_K: int = 10) -> Dict:
     # initialize client
-    # 4. 使用绝对路径
     chroma_db_path = os.path.join(project_root, 'rag', 'chroma_db')
     db = chromadb.PersistentClient(path=chroma_db_path)
 
@@ -126,7 +122,6 @@ def rag_semantics_retrieve(query: str, schema: str, docstore: SimpleDocumentStor
 def rag_structure_retrieve(query: str, schema: str, docstore: SimpleDocumentStore, embed_dim: int,
                            RETRIEVER_TOP_K: int = 10) -> Dict:
     # initialize client
-    # 5. 使用绝对路径
     chroma_db_path = os.path.join(project_root, 'rag', 'chroma_db')
     db = chromadb.PersistentClient(path=chroma_db_path)
 
